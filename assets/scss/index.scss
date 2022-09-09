@@ -15,6 +15,8 @@ $mellow-yellow:#E9C46A;
     a{
         text-decoration: none;
     }
+
+    overflow: hidden;
 }
 
 #left-panel{
@@ -43,7 +45,7 @@ $mellow-yellow:#E9C46A;
 
     #form-panel{
         margin-top:5em;
-        
+
         input{
             background-color: #EBEBEB;
             border: none;
@@ -60,7 +62,7 @@ $mellow-yellow:#E9C46A;
         }
         
         #login-btn{
-            margin-top:6em;
+            margin-top:3em;
             
             button{
                 background-color:$secondary-color;
@@ -119,6 +121,7 @@ $mellow-yellow:#E9C46A;
 }
 
 @media (max-width:992px) {
+
     #left-panel{
         #title{
             margin-top:-3em;
@@ -130,13 +133,26 @@ $mellow-yellow:#E9C46A;
             #div-btn{
                 margin-top:3em;
             }
+
+            p{
+                font-size:1.25rem ;
+            }
         }
     }
 }
 
-@media (max-width: 768px){
+@media (max-width: 790px){
+    *{
+        overflow: visible;
+    }
+    #side-panel{
+        display: none;
+        visibility: hidden;
+        //height: 120em;
+    }
+
     #left-panel{
-        margin-left:1.5em;
+        margin-left:4.5em;
 
         #form-panel{
             input{
@@ -144,6 +160,7 @@ $mellow-yellow:#E9C46A;
             }
         }
     }
+    
 }
 
 @media (max-width: 576px){
@@ -194,9 +211,9 @@ $mellow-yellow:#E9C46A;
 }
 
 @media (max-width: 360px){
-    #side-panel{
-        display:none;
-    }
+    // #side-panel{
+    //     display:none;
+    // }
     
     #left-panel{
         margin-left:1em;
@@ -240,11 +257,12 @@ $mellow-yellow:#E9C46A;
             
             #login-btn{
                 margin-top:-1em;
-                width:6em;
+                width:10em;
+                font-size: 1rem;
 
                 button{
                     font:$font-stack;
-                    height: 2em;
+                    height: 2.5em;
                     border-radius:1.25em;
                 }
             }
