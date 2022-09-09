@@ -146,7 +146,20 @@
   }
 }
 
-@media only screen and (max-width: 880px) {
+@media only screen and (max-width: 992px) {
+  #dashboard-summary #row3 #pwd {
+    background-color: #04496A;
+    margin: 0em 0em 0em 0em;
+  }
+  #dashboard-summary #row3 #pwd #pwd-img {
+    padding: -5px 0px 20px 0px;
+    position: relative;
+    width: 10em;
+    height: 8em;
+  }
+}
+
+@media only screen and (max-width: 886px) {
   .dashboard-title {
     padding: 1.5em 0em 0em 1em;
   }

@@ -6,6 +6,10 @@
   font: DM Sans, sans serif;
 }
 
+* a {
+  text-decoration: none;
+}
+
 #left-panel {
   margin-left: 6em;
 }
@@ -60,6 +64,11 @@
   border-radius: 1.5em;
   border: none;
   border-color: transparent;
+}
+
+#left-panel #form-panel #login-btn button a {
+  color: #fff;
+  font-size: 1.25rem;
 }
 
 .side-img {
