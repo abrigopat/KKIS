@@ -1,16 +1,38 @@
-$font-stack: DM Sans, sans serif;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,500;0,600;0,700;0,800;1,500;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap");
+
+@font-face {
+    font-family: "Poppins";
+    src: url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,500;0,600;0,700;0,800;1,500;1,700&display=swap");
+}
+
+@font-face {
+    font-family: "DM Sans";
+    src: url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,500;0,600;0,700;0,800;1,500;1,700&display=swap");
+}
+
+$headings-font: "Poppins";
+$content-font:"DM Sans";
 $primary-color: #04496A;
 $secondary-color:#FFB703;
 $true-blue:#219EBC;
 $sky-blue:#8ECAE6;
 $tangerine:#FB8500;
 $mellow-yellow:#E9C46A;
+$texts:#393737;
 
 *{
-    font:$font-stack;
 
     a{
         text-decoration: none;
+    }
+
+    h1{
+        font-family: $headings-font;
+    }
+
+    p{
+        font-family:$content-font;
     }
 }
 
@@ -19,6 +41,8 @@ $mellow-yellow:#E9C46A;
     
     h1{
         font-size: 50px;
+        color: #393737;
+        font-weight: 600;
     }
 }
 
@@ -27,7 +51,8 @@ $mellow-yellow:#E9C46A;
 }
 
 #dashboard-summary{
-    padding: 1em 8em 0em 8em;
+    padding: 1em 7em 0em 8em;
+    // padding: 1em 8em 0em 8em;
 
     
     div{
@@ -35,13 +60,16 @@ $mellow-yellow:#E9C46A;
     }
     
     #texts{
-        padding-top:1rem;
+        padding-top:1.5rem;
+        width: 0%;
+        z-index: 10;
         
         h1{
             color:#fff;
             padding-left:1.5rem;
             padding-right:1.5rem;
             font-size: 4rem;
+            font-weight: 500;
             //margin:0em;
             //float:left;
         }
@@ -50,14 +78,17 @@ $mellow-yellow:#E9C46A;
             color:#fff;
             padding-left:1.5rem;
             padding-right:1.5rem;
-            font-size: 22px;
+            margin-top: -.5em;
+            font-size: 1.5rem;
+            width: 15em;
+            z-index: 10;
             //float:left;
         }
     }
     
-    #dashboard-img{
+    .dashboard-img{
         //margin:10;
-        padding:8em 1em 0em 0em;
+        padding:8em 0em 0em 0em;
         //float: right;
         //padding:0rem 1rem 1rem 0rem;
     }
@@ -68,6 +99,7 @@ $mellow-yellow:#E9C46A;
         overflow: hidden;
         height:257px;
         width: 100%;
+        //margin-right: 0em;
         //margin-right:2em;
     }
     
@@ -75,21 +107,26 @@ $mellow-yellow:#E9C46A;
         
         #total-youth {
         background-color: $sky-blue;
+        padding-right: 1em;
+
+            .total-youth-img{
+                padding-left: -3em;
+            }
         }
         
         #enrolled-youth {
         background-color: $true-blue;
             
-            #dashboard-img{
-                padding:6em 1em 0em 0em;
+            .dashboard-img{
+                padding:5.5em 1em 0em 0em;
             }
         }
         
         #out-of-school-youth {
         background-color: $primary-color;
             
-             #dashboard-img{
-                padding:6em 1em 0em 0em;
+            .dashboard-img{
+                padding:6em 2em 0em 0em;
             }
         }
     
@@ -98,7 +135,7 @@ $mellow-yellow:#E9C46A;
         #working-student {
         background-color: $mellow-yellow;
             
-            #dashboard-img{
+            .dashboard-img{
                 padding:6.9em 1em 0em 0em;
             }
         }
@@ -106,7 +143,7 @@ $mellow-yellow:#E9C46A;
         #employed {
         background-color: $secondary-color;
             
-            #dashboard-img{
+            .dashboard-img{
                 padding:8.5em 1em 0em 0em;
             }
         }
@@ -114,18 +151,18 @@ $mellow-yellow:#E9C46A;
         #unemployed{
         background-color: $tangerine;
             
-            #dashboard-img{
+            .dashboard-img{
                 padding:4.5em 1em 0em 0em;
             }
         }
 
     
-         padding-top:3em;
+        //padding-top:3em;
         
         #registered-voters {
             background-color: $sky-blue;
 
-            #dashboard-img{
+            .dashboard-img{
                 padding:7.5em 1em 0em 0em;
             }
         }
@@ -133,32 +170,116 @@ $mellow-yellow:#E9C46A;
         #unregistered-voters {
             background-color: $true-blue;
 
+            .dashboard-img{
+                padding:8.5em 1.25em 0em 0em;
+                // max-width: 100%;
+                // height: auto;
+            }
         }
         
         #pwd {
             background-color: $primary-color;
             
-            #dashboard-img{
-                padding:2em 0em 0em 0em;
+            .dashboard-img{
+                padding:5.75em 0em 0em 0em;
+                // max-width: 100%;
+                // height: auto;
             }
         }
     }
 }
 
 @media only screen and (max-width: 1208px){
+    .sidenav{
+        display: none;
+    }
+
     .dashboard-title{
-        padding: 2em 0em 0em 3em
+        padding: 2em 0em 0em 0em;
     }
     #dashboard-summary{
-        padding: 0em 3em 0em 3em;
+        padding: 0em 3em 0em 0em;
+    }
+}
+
+@media (max-width:992px){
+    #dashboard-summary{
+        #texts{
+            p{
+                font-size: 1.15rem;
+            }
+        }
     }
 }
 
 @media only screen and (max-width: 768px){
     .dashboard-title{
-        padding: 1.5em 0em 0em 1em
+        padding: 1.5em 0em 0em -1em;
     }
     #dashboard-summary{
-        padding: 0em 1em 0em 1em;
+        padding: 0em 1em 0em -1em;
+
+        #texts{
+            p{
+                font-size: 1.5rem;
+                width: 15em;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 576px){
+    .dashboard-title{
+        padding: 1.5em 0em 0em -1em;
+        margin-left: -3em;
+
+        h1{
+            font-size: 2em;
+        }
+    }
+
+    .gradient-line{
+        width: 10em;
+    }
+
+    #dashboard-summary{
+        // top right bottom left
+        padding-left: 0em;
+        margin: -3em;
+
+        #dashboard-img{
+            display: none;
+        }
+
+        #texts{
+            h1{
+                font-size: 3rem;
+            }
+
+            p{
+                font-size: 1.25rem; 
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 360px){
+    .dashboard-title{
+        padding: 1.5em 0em 0em -1em;
+        margin-left: -3em;
+
+        h1{
+            font-size: 2em;
+        }
+    }
+
+    #dashboard-summary{
+        .dashboard-img{
+            display: none;
+        }
+        
+        .category{
+            height: 180px;
+        }
     }
 }
