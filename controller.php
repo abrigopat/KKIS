@@ -47,7 +47,6 @@
     }
 
 
-
     // CHANGE PW
 
     if(isset($_POST["updatePassBtn"])) {     
@@ -56,9 +55,8 @@
         $confirmpassword = $_POST['confirmPassword'];
     
     
-    if (!empty( $currentpassword) || !empty( $newpassword ) ||  !empty($confirmpassword)) {
+    if (!empty( $currentpassword) || !empty( $newPassword ) ||  !empty($confirmpassword)) {
     
-        //QUERY for DATABASE
         $passwordquery = "SELECT * FROM `admins` WHERE `email` ='" . $_SESSION['email'] . "'";
     
         $passwordresult = executeQuery($passwordquery);
@@ -66,10 +64,8 @@
     
         if ($count == 1) {
             while ($row = mysqli_fetch_assoc($passwordresult)) {
-    
-                //Data from Database
+
                 $fetchpassword = $row['password'];
-    
     
                 if (!password_verify($currentpassword, $fetchpassword)) {
                     echo '<script>alert("Invalid current password!")</script>';
@@ -78,32 +74,31 @@
                     echo '<script>alert("New password is the same as current password!")</script>';
     
                 } else if ($newpassword != $confirmpassword){
-                    echo '<script>alert("New password does not match with confirm password!")</script>';
-    
+                    echo '<script>alert("New password doe not match with confirm password!")</script>';
                 
-                } else if (password_verify($currentpassword, $fetchpassword)) {
+                }else if (password_verify($currentpassword, $fetchpassword)) {
                     
                     if ($newpassword == $confirmpassword) {
-                        $password_raw = $_POST['newpassword'];
+                        $password_raw = $_POST['newPassword'];
                         $number = preg_match('@[0-9]@', $password_raw);
                         $uppercase = preg_match('@[A-Z]@', $password_raw);
                         $lowercase = preg_match('@[a-z]@', $password_raw);
                         $specialChars = preg_match('@[^\w]@', $password_raw);
     
                         if (strlen($password_raw) < 8 || !$number || !$uppercase || !$lowercase || !$specialChars) {
-                            header("Location: settings-change-password.php?password_not_strong");
+                            echo '<script>alert("Password not strong! Use a combination of uppercase, lowercase, numbers and special characters.")</script>';
                         
                         } else {
                             $hash = password_hash($password_raw, PASSWORD_DEFAULT);
     
-                            $updatequery = "UPDATE admins SET password`='" . $hash . "' WHERE email` ='" . $_SESSION['email'] . "'";
+                            $updatequery = "UPDATE `admins` SET `password`='" . $hash . "' WHERE `email` ='" . $_SESSION['email'] . "'";
                             executeQuery($updatequery);
                             header("Location: index.php");
                         }
                     }
     
                     else { 
-                        header("Location: settings-change-password.php?error=invalid_confirm_password");
+                        echo '<script>alert("Invalid confirm password!")</script>';
                     }
     
                 }
@@ -111,7 +106,56 @@
         }
     }
     else{
-        header("Location: settings-change-password.php?error=all_fields_are_required");
+        echo '<script>alert("All fields are required!")</script>';
     }
     }
+
+
+    // FORGOT PASSWORD
+    if(isset($_POST["resetBtn"])){
+        $emailquery = "SELECT * FROM `admins` WHERE `email` = '" . $_POST['email'] . "'";
+
+        $emailresult = executeQuery($emailquery);
+        $count = mysqli_num_rows($emailresult);
+
+        if ($count==1){
+            
+            while($row = mysqli_fetch_assoc($emailresult)) {
+            $email = $row['email'];
+
+                if($_POST['email']==$email){
+
+                    if($_POST['newPassword'] == $_POST['confirmPassword']){
+
+                        $password_raw = $_POST['newPassword'];
+                        $number = preg_match('@[0-9]@', $password_raw);
+                        $uppercase = preg_match('@[A-Z]@', $password_raw);
+                        $lowercase = preg_match('@[a-z]@', $password_raw);
+                        $specialChars = preg_match('@[^\w]@', $password_raw);
+
+                        if(strlen($password_raw) < 8 || !$number || !$uppercase || !$lowercase || !$specialChars){
+
+                            echo '<script>alert("Password not strong! Use a combination of uppercase, lowercase, numbers and special characters.")</script>';
+                        } else {
+
+                            $hash = password_hash($password_raw, PASSWORD_DEFAULT);
+    
+                            $updatequery = "UPDATE `admins` SET `password`='" . $hash . "' WHERE `email` ='" . $_POST['email'] . "'";
+                            executeQuery($updatequery);
+                            echo '<script>alert("Password changed successfully!")</script>';
+                        }
+                    }
+
+                    else { 
+                        echo '<script>alert("Invalid confirm password!")</script>';
+                    }
+                }
+            }
+        }
+
+        else{
+            echo '<script>alert("All fields are required!")</script>';
+        }
+    }
+
 ?>

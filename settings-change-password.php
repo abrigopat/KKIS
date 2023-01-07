@@ -5,9 +5,6 @@
   session_start();
 
   include 'controller.php';
-
-  
-
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +36,7 @@
 
 <body>
 
-    <div class="expanded d-none d-lg-flex" id="leftPanel>
+<div class="expanded d-none d-lg-flex" id="leftPanel">
         <?php
         include "settings.php";
         ?>
@@ -83,7 +80,7 @@
                                         </div>
                                         <div class="col-12">
                                             <input class="form-control" type="password" name="confirmPassword"
-                                                placeholder="Confirm Password" name="confirmPassword" required>
+                                                placeholder="Confirm Password" required>
                                         </div>
                                     </div>
 
