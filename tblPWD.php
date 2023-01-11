@@ -3,7 +3,7 @@ session_start();
 require "connection.php";
 require "modals.php";
 
-$queryPWD = "SELECT *, CONCAT(`last_name`, ', ', `first_name`, ' ', `middle_name`) AS  full_name, DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 AS age, households.head_remarks FROM `residents` LEFT JOIN `households` ON residents.household_id = households.household_id WHERE `disability` != 'None' "; //query to select all data from table
+$queryPWD = "SELECT *, CONCAT(`last_name`, ', ', `first_name`, ' ', `middle_name`) AS  full_name, DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 AS age, households.head_remarks FROM `residents` RIGHT JOIN `households` ON residents.household_id = households.household_id WHERE `disability` != 'None' "; //query to select all data from table
 $queryPWDResult = executeQuery($queryPWD); //execute query
 
 ?>
@@ -51,7 +51,7 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                 <div class="col-md-8 col-12 d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-bars me-4 d-none" id="hamburger" role="button"></i>
                     <i class="fa-solid fa-xmark me-4" id="close" role="button"></i>
-                    <span class="pageTitle">Registered Voters</span>
+                    <span class="pageTitle">PWDs</span>
                 </div>
 
                 <div class="col-md-4 d-none d-md-flex justify-content-end align-items-center">
@@ -138,12 +138,12 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                     <td id="remarks" class="entryRow" scope="col" data-label="Remarks"><?php echo $pwd["head_remarks"]; ?></td>
 
                                     <td id="actions" class="entryRow" scope="col" data-label="Actions">
-                                        <div class="row mx-0 p-0">
+                                        <div class="row mx-0 p-2">
                                             <!-- View More -->
-                                            <div class="col-lg-12 col-12 d-flex justify-content-center align-items-center p-3">
-                                                <a class="btn btn-warning actionBtn" data-bs-toggle="modal" data-bs-target="#viewMore<?php echo $pwd["resident_id"]; ?>" data-id="<?php echo $pwd["resident_id"]; ?>" href="#viewMore"><i class="fa-regular fa-eye"></i></a>
+                                            <div class="col-lg-12 col-12 d-flex justify-content-center align-items-center p-0">
+                                                <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#viewMore<?php echo $pwd["resident_id"]; ?>" data-id="<?php echo $pwd["resident_id"]; ?>" href="#viewMore">View More</a>
                                             </div>
-                                        </div>
+                                        </div>  
                                     </td>
 
                                 </tr>
@@ -153,7 +153,7 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                     <div class="modal-dialog" id="modalDialogID" role="document">
                                         <div class="modal-content" id="modalContentID">
                                             <div class="modal-header" id="modalHeaderID">
-                                                <h4 class="modal-title" id="modalTitleID">Kabataan Information</h4>
+                                                <h4 class="modal-title" id="modalTitleID">PWD Information</h4>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <hr id="modalHR">
