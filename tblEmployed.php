@@ -3,7 +3,7 @@ session_start();
 require "connection.php";
 require "modals.php";
 
-$queryEmployed = "SELECT *, CONCAT(`last_name`, ', ', `first_name`, ' ', `middle_name`) AS  full_name, DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 AS age, employment_info.employment_status FROM `employment_info` LEFT JOIN `residents` ON employment_info.resident_id = residents.resident_id WHERE `employment_status` = 'Employed' "; //query to select all data from table
+$queryEmployed = "SELECT *, CONCAT(`last_name`, ', ', `first_name`, ' ', `middle_name`) AS  full_name, DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 AS age, employment_info.employment_status FROM `employment_info` RIGHT JOIN `residents` ON employment_info.resident_id = residents.resident_id WHERE `employment_status` = 'Employed' "; //query to select all data from table
 $queryEmployedResult = executeQuery($queryEmployed); //execute query
 
 ?>
@@ -140,8 +140,8 @@ $queryEmployedResult = executeQuery($queryEmployed); //execute query
                                     <td id="actions" class="entryRow" scope="col" data-label="Actions">
                                         <div class="row mx-0 p-0">
                                             <!-- View More -->
-                                            <div class="col-lg-12 col-12 d-flex justify-content-center align-items-center p-0">
-                                                <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#viewMore<?php echo $outOfSchool["resident_id"]; ?>" data-id="<?php echo $outOfSchool["resident_id"]; ?>" href="#viewMore">View More</a>
+                                            <div class="col-lg-12 col-12 d-flex justify-content-center align-items-center p-2">
+                                                <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#viewMore<?php echo $employed["resident_id"]; ?>" data-id="<?php echo $employed["resident_id"]; ?>" href="#viewMore">View More</a>
                                             </div>
                                         </div>  
                                     </td>
@@ -153,7 +153,7 @@ $queryEmployedResult = executeQuery($queryEmployed); //execute query
                                     <div class="modal-dialog" id="modalDialogID" role="document">
                                         <div class="modal-content" id="modalContentID">
                                             <div class="modal-header" id="modalHeaderID">
-                                                <h4 class="modal-title" id="modalTitleID">Kabataan Information</h4>
+                                                <h4 class="modal-title" id="modalTitleID">Employed Information</h4>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <hr id="modalHR">
@@ -220,7 +220,7 @@ $queryEmployedResult = executeQuery($queryEmployed); //execute query
                                                 </div>
 
                                                 <div class="row rowContainer my-4 mx-2" id="modalRow2">
-                                                    <div class="col col-12 p-0">
+                                                    <div class="col col-12 p-2">
                                                         <div class="markerContainer px-3" id="row2Header">
                                                             <p class="modalMarker" id="row2Title">Status</p>
                                                         </div>
