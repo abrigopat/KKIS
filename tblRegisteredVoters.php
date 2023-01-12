@@ -3,8 +3,8 @@ session_start();
 require "connection.php";
 require "modals.php";
 
-$queryPWD = "SELECT *, CONCAT(`last_name`, ', ', `first_name`, ' ', `middle_name`) AS  full_name, DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 AS age FROM `residents` WHERE `disability` != 'None' "; //query to select all data from table
-$queryPWDResult = executeQuery($queryPWD); //execute query
+$queryRegisteredVoters = "SELECT *, CONCAT(`last_name`, ', ', `first_name`, ' ', `middle_name`) AS  full_name, DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 AS `age` FROM `residents` WHERE `voter_type` = 'Registered' "; //query to select all data from table
+$queryRegisteredVoters = executeQuery($queryRegisteredVoters); //execute query
 
 ?>
 
@@ -14,7 +14,7 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>PWDs</title>
+    <title>Registered Voters</title>
 
     <!-- Custom Page Stylesheets -->
     <!-- <link rel="stylesheet" href="assets/scss/viewModal.css"> -->
@@ -50,7 +50,7 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
             <div class="row mx-0" id="headerRow">
                 <div class="col-md-8 col-12 d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-left me-4" role="button" id="backPage"></i>
-                    <span class="pageTitle">PWDs</span>
+                    <span class="pageTitle">Registered Voters</span>
                 </div>
 
                 <div class="col-md-4 d-none d-md-flex justify-content-end align-items-center">
@@ -112,44 +112,43 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
 
                         <tbody>
                             <?php
-                            while ($pwd = mysqli_fetch_array($queryPWDResult)) {
-                                $pwdID = $pwd["resident_id"]; //get resident id
-                                $pwdEID = $pwd["rencrypted_id"];
+                            while ($registeredVoters = mysqli_fetch_array($queryRegisteredVoters)) {
+                                $registeredVotersID = $registeredVoters["resident_id"]; //get resident id
+                                $registeredVotersEID = $registeredVoters["rencrypted_id"];
                             ?>
 
                                 <tr>
 
-                                    <td id="fullName" class="entryRow" scope="col" data-label="Name"><?php echo $pwd["full_name"]; ?></td>
+                                    <td id="fullName" class="entryRow" scope="col" data-label="Name"><?php echo $registeredVoters["full_name"]; ?></td>
 
-                                    <td id="gender" class="entryRow" scope="col" data-label="Gender"><?php echo $pwd["gender_preference"]; ?></td>
+                                    <td id="gender" class="entryRow" scope="col" data-label="Gender"><?php echo $registeredVoters["gender_preference"]; ?></td>
 
-                                    <td id="age" class="entryRow" scope="col" data-label="Age"><?php echo $pwd["age"]; ?></td>
+                                    <td id="age" class="entryRow" scope="col" data-label="Age"><?php echo $registeredVoters["age"]; ?></td>
 
-                                    <td id="birthday" class="entryRow" scope="col" data-label="Birthdate"><?php echo $pwd["birthday"]; ?></td>
+                                    <td id="birthday" class="entryRow" scope="col" data-label="Birthdate"><?php echo $registeredVoters["birthday"]; ?></td>
 
-                                    <td id="civilStatus" class="entryRow" scope="col" data-label="Civil status"><?php echo $pwd["marital_status"]; ?></td>
+                                    <td id="civilStatus" class="entryRow" scope="col" data-label="Civil status"><?php echo $registeredVoters["marital_status"]; ?></td>
 
-                                    <td id="contactNo" class="entryRow" scope="col" data-label="Contact No."><?php echo $pwd["contact_no"]; ?></td>
+                                    <td id="contactNo" class="entryRow" scope="col" data-label="Contact No."><?php echo $registeredVoters["contact_no"]; ?></td>
 
 
-                                    <td id="purok" class="entryRow" scope="col" data-label="Purok"><?php echo $pwd["purok"]; ?></td>
+                                    <td id="purok" class="entryRow" scope="col" data-label="Purok"><?php echo $registeredVoters["purok"]; ?></td>
 
-                                    <td id="remarks" class="entryRow" scope="col" data-label="Remarks"><?php echo $pwd["remarks"]; ?></td>
+                                    <td id="remarks" class="entryRow" scope="col" data-label="Remarks"><?php echo $registeredVoters["remarks"]; ?></td>
 
                                     <td id="actions" class="entryRow" scope="col" data-label="Actions">
                                         <div class="row mx-0 p-2">
                                             <!-- View More -->
                                             <div class="col-lg-12 col-12 d-flex justify-content-center align-items-center p-0">
-                                                <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#viewMore<?php echo $pwd["resident_id"]; ?>" data-id="<?php echo $pwd["resident_id"]; ?>" href="#viewMore">View More</a>
+                                                <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#viewMore<?php echo $registeredVoters["resident_id"]; ?>" data-id="<?php echo $registeredVoters["resident_id"]; ?>" href="#viewMore">View More</a>
                                             </div>
                                         </div>
                                     </td>
 
                                 </tr>
 
-
                                 <!-- Kabataan Modal -->
-                                <div class="modal" role="dialog" tabindex="1" id="viewMore<?php echo $pwd["resident_id"]; ?>">
+                                <div class="modal" role="dialog" tabindex="1" id="viewMore<?php echo $registeredVoters["resident_id"]; ?>">
                                     <div class="modal-dialog modal-xl modal-dialog-scrollable" id="modalDialogID" role="document">
                                         <div class="modal-content" id="modalContentID">
                                             <div class="modal-header" id="modalHeaderID">
@@ -166,16 +165,16 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                                 <!-- Text -->
                                                 <div class="col-md-8 col-12 d-flex align-items-center">
                                                     <div>
-                                                        <span class="basicTxt w-100 my-1" id="nameTxt"><?php echo $pwd["full_name"]; ?></span>
+                                                        <span class="basicTxt w-100 my-1" id="nameTxt"><?php echo $registeredVoters["full_name"]; ?></span>
                                                         <br>
-                                                        <span class="basicTxt w-100 my-1 mt-2" id="ageGender"><?php echo $pwd["age"] . " YEARS OLD, " . $pwd["gender_preference"]; ?></span>
+                                                        <span class="basicTxt w-100 my-1 mt-2" id="ageGender"><?php echo $registeredVoters["age"] . " YEARS OLD, " . $registeredVoters["gender_preference"]; ?></span>
                                                         <br>
-                                                        <span class="basicTxt w-100 my-1" id="purok"><?php echo $pwd["purok"]; ?></span>
+                                                        <span class="basicTxt w-100 my-1" id="purok"><?php echo $registeredVoters["purok"]; ?></span>
                                                     </div>
                                                 </div>
                                                 <!-- QR Code -->
                                                 <div class="col-12 col-md-4 d-flex justify-content-md-end justify-content-center">
-                                                    <img class="rounded-2" src="<?php echo $pwd["qr_code"]; ?>" width="200px" height="auto">
+                                                    <img class="rounded-2" src="<?php echo $registeredVoters["qr_code"]; ?>" width="200px" height="auto">
                                                 </div>
                                             </div>
 
@@ -192,70 +191,70 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                                     <label class="form-label modalLabel">Birthday:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["birthday"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["birthday"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Voter Type:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["voter_type"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["voter_type"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">Birthplace:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["birthplace"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["birthplace"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Contact No:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["contact_no"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["contact_no"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">Marital Status:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["marital_status"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["marital_status"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Religion:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["religion"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["religion"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">Disability:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["disability"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["disability"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Organization/s (if any):&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["organization"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["organization"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">House Address:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["house_address"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["house_address"]; ?></p>
                                                 </div>
 
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Remarks:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $pwd["remarks"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $registeredVoters["remarks"]; ?></p>
                                                 </div>
                                             </div>
 
@@ -278,9 +277,10 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                                     </div>
                                                 </div>
 
-
+                                                
                                             </div>
 
+                                            <!-- Old Status -->
                                             <div class="row rowContainer my-4 mx-2" id="modalRow2">
                                                 <div class="col col-12 p-0">
                                                     <div class="markerContainer px-3" id="row2Header">
@@ -289,10 +289,10 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                                 </div>
 
                                                 <?php
-                                                $employmentCheck = "SELECT * FROM employment_info WHERE resident_id = $pwdID"; //check if resident has employment info
+                                                $employmentCheck = "SELECT * FROM employment_info WHERE resident_id = $registeredVotersID"; //check if resident has employment info
                                                 $employmentCheckResult = executeQuery($employmentCheck);
 
-                                                $educationCheck = "SELECT * FROM educational_info WHERE resident_id = $pwdID"; //check if resident has educational info
+                                                $educationCheck = "SELECT * FROM educational_info WHERE resident_id = $registeredVotersID"; //check if resident has educational info
                                                 $educationCheckResult = executeQuery($educationCheck);
 
                                                 if ($employment = mysqli_fetch_array($employmentCheckResult)) { //checking if the user is an employee
@@ -457,7 +457,7 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                                     ?>
                                                 <?php
                                                 }
-                                                $household_id = $pwd["household_id"]; //getting the household id of the user
+                                                $household_id = $registeredVoters["household_id"]; //getting the household id of the user
                                                 $householdCheck = "SELECT *, CONCAT(`head_first_name`, ', ', `head_first_name`, ' ', `head_middle_name`) AS `head_name` FROM households WHERE household_id = $household_id"; //getting the household details of the user
                                                 $householdCheckResult = executeQuery($householdCheck);
                                                 ?>
@@ -480,7 +480,7 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                                             </div>
                                                             <div class="col col-12" id="row4ContentDiv">
                                                                 <label class="form-label modalLabel">Remarks:</label>
-                                                                <p class="textRetrieved" id="textRetrievedID1"><?php echo $pwd["remarks"]; ?></p>
+                                                                <p class="textRetrieved" id="textRetrievedID1"><?php echo $registeredVoters["remarks"]; ?></p>
                                                             </div>
                                                             <div class="col col-12" id="row4ContentDiv">
                                                                 <label class="form-label modalLabel">No. of members:</label>
@@ -495,7 +495,6 @@ $queryPWDResult = executeQuery($queryPWD); //execute query
                                         </div>
                                     </div>
                                 </div>
-
 
 
                             <?php
