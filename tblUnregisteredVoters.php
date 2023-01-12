@@ -3,8 +3,8 @@ session_start();
 require "connection.php";
 require "modals.php";
 
-$queryKabataan = "SELECT *, CONCAT(`last_name`, ', ', `first_name`, ' ', `middle_name`) AS  full_name, DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 AS `age` FROM `residents` WHERE DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 BETWEEN 14 AND 31"; //query to select all data from table
-$queryKabataanResult = executeQuery($queryKabataan); //execute query
+$queryUnregisteredVoters = "SELECT *, CONCAT(`last_name`, ', ', `first_name`, ' ', `middle_name`) AS  full_name, DATE_FORMAT(FROM_DAYS(DATEDIFF(NOW(), birthday)), '%Y') + 0 AS `age` FROM `residents` WHERE `voter_type` != 'Registered' "; //query to select all data from table
+$queryUnregisteredVotersResult = executeQuery($queryUnregisteredVoters); //execute query
 
 ?>
 
@@ -14,7 +14,7 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Total Youth</title>
+    <title>Unregistered Voters</title>
 
     <!-- Custom Page Stylesheets -->
     <!-- <link rel="stylesheet" href="assets/scss/viewModal.css"> -->
@@ -50,7 +50,7 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
             <div class="row mx-0" id="headerRow">
                 <div class="col-md-8 col-12 d-flex justify-content-start align-items-center">
                     <i class="fa-solid fa-arrow-left me-4" role="button" id="backPage"></i>
-                    <span class="pageTitle">Total Youth</span>
+                    <span class="pageTitle">Unregistered Voters</span>
                 </div>
 
                 <div class="col-md-4 d-none d-md-flex justify-content-end align-items-center">
@@ -112,43 +112,44 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
 
                         <tbody>
                             <?php
-                            while ($kabataan = mysqli_fetch_array($queryKabataanResult)) {
-                                $kabataanID = $kabataan["resident_id"]; //get resident id
-                                $kabataanEID = $kabataan["rencrypted_id"];
+                            while ($unregisteredVoters = mysqli_fetch_array($queryUnregisteredVotersResult)) {
+                                $unregisteredVotersID = $unregisteredVoters["resident_id"]; //get resident id
+                                $unregisteredVotersEID = $unregisteredVoters["rencrypted_id"];
                             ?>
 
                                 <tr>
 
-                                    <td id="fullName" class="entryRow" scope="col" data-label="Name"><?php echo $kabataan["full_name"]; ?></td>
+                                    <td id="fullName" class="entryRow" scope="col" data-label="Name"><?php echo $unregisteredVoters["full_name"]; ?></td>
 
-                                    <td id="gender" class="entryRow" scope="col" data-label="Gender"><?php echo $kabataan["gender_preference"]; ?></td>
+                                    <td id="gender" class="entryRow" scope="col" data-label="Gender"><?php echo $unregisteredVoters["gender_preference"]; ?></td>
 
-                                    <td id="age" class="entryRow" scope="col" data-label="Age"><?php echo $kabataan["age"]; ?></td>
+                                    <td id="age" class="entryRow" scope="col" data-label="Age"><?php echo $unregisteredVoters["age"]; ?></td>
 
-                                    <td id="birthday" class="entryRow" scope="col" data-label="Birthdate"><?php echo $kabataan["birthday"]; ?></td>
+                                    <td id="birthday" class="entryRow" scope="col" data-label="Birthdate"><?php echo $unregisteredVoters["birthday"]; ?></td>
 
-                                    <td id="civilStatus" class="entryRow" scope="col" data-label="Civil status"><?php echo $kabataan["marital_status"]; ?></td>
+                                    <td id="civilStatus" class="entryRow" scope="col" data-label="Civil status"><?php echo $unregisteredVoters["marital_status"]; ?></td>
 
-                                    <td id="contactNo" class="entryRow" scope="col" data-label="Contact No."><?php echo $kabataan["contact_no"]; ?></td>
+                                    <td id="contactNo" class="entryRow" scope="col" data-label="Contact No."><?php echo $unregisteredVoters["contact_no"]; ?></td>
 
 
-                                    <td id="purok" class="entryRow" scope="col" data-label="Purok"><?php echo $kabataan["purok"]; ?></td>
+                                    <td id="purok" class="entryRow" scope="col" data-label="Purok"><?php echo $unregisteredVoters["purok"]; ?></td>
 
-                                    <td id="remarks" class="entryRow" scope="col" data-label="Remarks"><?php echo $kabataan["remarks"]; ?></td>
+                                    <td id="remarks" class="entryRow" scope="col" data-label="Remarks"><?php echo $unregisteredVoters["remarks"]; ?></td>
 
                                     <td id="actions" class="entryRow" scope="col" data-label="Actions">
                                         <div class="row mx-0 p-2">
                                             <!-- View More -->
                                             <div class="col-lg-12 col-12 d-flex justify-content-center align-items-center p-0">
-                                                <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#viewMore<?php echo $kabataan["resident_id"]; ?>" data-id="<?php echo $kabataan["resident_id"]; ?>" href="#viewMore">View More</a>
+                                                <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#viewMore<?php echo $unregisteredVoters["resident_id"]; ?>" data-id="<?php echo $unregisteredVoters["resident_id"]; ?>" href="#viewMore">View More</a>
                                             </div>
                                         </div>
                                     </td>
 
                                 </tr>
 
+
                                 <!-- Kabataan Modal -->
-                                <div class="modal" role="dialog" tabindex="1" id="viewMore<?php echo $kabataan["resident_id"]; ?>">
+                                <div class="modal" role="dialog" tabindex="1" id="viewMore<?php echo $unregisteredVoters["resident_id"]; ?>">
                                     <div class="modal-dialog modal-xl modal-dialog-scrollable" id="modalDialogID" role="document">
                                         <div class="modal-content" id="modalContentID">
                                             <div class="modal-header" id="modalHeaderID">
@@ -165,19 +166,19 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
                                                 <!-- Text -->
                                                 <div class="col-md-8 col-12 d-flex align-items-center">
                                                     <div>
-                                                        <span class="basicTxt w-100 my-1" id="nameTxt"><?php echo $kabataan["full_name"]; ?></span>
+                                                        <span class="basicTxt w-100 my-1" id="nameTxt"><?php echo $unregisteredVoters["full_name"]; ?></span>
                                                         <br>
-                                                        <span class="basicTxt w-100 my-1 mt-2" id="ageGender"><?php echo $kabataan["age"] . " YEARS OLD, " . $kabataan["gender_preference"]; ?></span>
+                                                        <span class="basicTxt w-100 my-1 mt-2" id="ageGender"><?php echo $unregisteredVoters["age"] . " YEARS OLD, " . $unregisteredVoters["gender_preference"]; ?></span>
                                                         <br>
-                                                        <span class="basicTxt w-100 my-1" id="purok"><?php echo $kabataan["purok"]; ?></span>
+                                                        <span class="basicTxt w-100 my-1" id="purok"><?php echo $unregisteredVoters["purok"]; ?></span>
                                                     </div>
                                                 </div>
                                                 <!-- QR Code -->
                                                 <div class="col-12 col-md-4 d-flex justify-content-md-end justify-content-center">
-                                                    <img class="rounded-2" src="<?php echo $kabataan["qr_code"]; ?>" width="200px" height="auto">
+                                                    <img class="rounded-2" src="<?php echo $unregisteredVoters["qr_code"]; ?>" width="200px" height="auto">
                                                 </div>
                                             </div>
-                                                            
+
                                             <!-- Personal Info -->
                                             <div class="row mx-3 px-3 my-5" width="100%" height="auto" style="border: 1px solid #aeaeae; border-radius: 20px;">
                                                 <div class="col-12 titleCol">
@@ -185,79 +186,79 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
                                                         <span class="rowTitle">Personal Information</span>
                                                     </div>
                                                 </div>
-                                                            
+
                                                 <br>
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">Birthday:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["birthday"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["birthday"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Voter Type:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["voter_type"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["voter_type"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">Birthplace:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["birthplace"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["birthplace"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Contact No:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["contact_no"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["contact_no"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">Marital Status:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["marital_status"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["marital_status"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Religion:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["religion"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["religion"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">Disability:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["disability"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["disability"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Organization/s (if any):&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["organization"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["organization"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-2 col-6">
                                                     <label class="form-label modalLabel">House Address:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-3 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["house_address"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["house_address"]; ?></p>
                                                 </div>
-                                                            
+
                                                 <div class="col-md-3 col-6">
                                                     <label class="form-label modalLabel">Remarks:&nbsp;</label>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $kabataan["remarks"]; ?></p>
+                                                    <p class="textRetrieved" id="textRetrievedID"><?php echo $unregisteredVoters["remarks"]; ?></p>
                                                 </div>
                                             </div>
-                                                            
+
                                             <!-- Status -->
                                             <div class="row mx-3 px-3 my-5" width="100%" height="auto" style="border: 1px solid #aeaeae; border-radius: 20px;">
                                                 <div class="col-12 titleCol">
@@ -265,10 +266,10 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
                                                         <span class="rowTitle">Status</span>
                                                     </div>
                                                 </div>
-                                                            
-                                                            
+
+
                                             </div>
-                                                            
+
                                             <!-- House Dec -->
                                             <div class="row mx-3 px-3 my-5" width="100%" height="auto" style="border: 1px solid #aeaeae; border-radius: 20px;">
                                                 <div class="col-12 titleCol">
@@ -276,11 +277,10 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
                                                         <span class="rowTitle">House Declaration</span>
                                                     </div>
                                                 </div>
-                                                            
-                                                            
+
+
                                             </div>
 
-                                            <!-- Old Status -->
                                             <div class="row rowContainer my-4 mx-2" id="modalRow2">
                                                 <div class="col col-12 p-0">
                                                     <div class="markerContainer px-3" id="row2Header">
@@ -289,10 +289,10 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
                                                 </div>
 
                                                 <?php
-                                                $employmentCheck = "SELECT * FROM employment_info WHERE resident_id = $kabataanID"; //check if resident has employment info
+                                                $employmentCheck = "SELECT * FROM employment_info WHERE resident_id = $unregisteredVotersID"; //check if resident has employment info
                                                 $employmentCheckResult = executeQuery($employmentCheck);
 
-                                                $educationCheck = "SELECT * FROM educational_info WHERE resident_id = $kabataanID"; //check if resident has educational info
+                                                $educationCheck = "SELECT * FROM educational_info WHERE resident_id = $unregisteredVotersID"; //check if resident has educational info
                                                 $educationCheckResult = executeQuery($educationCheck);
 
                                                 if ($employment = mysqli_fetch_array($employmentCheckResult)) { //checking if the user is an employee
@@ -457,7 +457,7 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
                                                     ?>
                                                 <?php
                                                 }
-                                                $household_id = $kabataan["household_id"]; //getting the household id of the user
+                                                $household_id = $unregisteredVoters["household_id"]; //getting the household id of the user
                                                 $householdCheck = "SELECT *, CONCAT(`head_first_name`, ', ', `head_first_name`, ' ', `head_middle_name`) AS `head_name` FROM households WHERE household_id = $household_id"; //getting the household details of the user
                                                 $householdCheckResult = executeQuery($householdCheck);
                                                 ?>
@@ -480,7 +480,7 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
                                                             </div>
                                                             <div class="col col-12" id="row4ContentDiv">
                                                                 <label class="form-label modalLabel">Remarks:</label>
-                                                                <p class="textRetrieved" id="textRetrievedID1"><?php echo $kabataan["remarks"]; ?></p>
+                                                                <p class="textRetrieved" id="textRetrievedID1"><?php echo $unregisteredVoters["remarks"]; ?></p>
                                                             </div>
                                                             <div class="col col-12" id="row4ContentDiv">
                                                                 <label class="form-label modalLabel">No. of members:</label>
@@ -495,6 +495,8 @@ $queryKabataanResult = executeQuery($queryKabataan); //execute query
                                         </div>
                                     </div>
                                 </div>
+
+                                            
 
                             <?php
                             };
