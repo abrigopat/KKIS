@@ -1,23 +1,31 @@
 <?php
-require 'connection.php';
-require 'modals.php';
-include "assets/phpqrcode/qrlib.php";
+require_once "access-staff.php";
+require_once "assets/phpqrcode/qrlib.php";
+require_once "assets/php-encrypt-decrypt-class-main/Encryption.php";
+
+$userRole = "SELECT `description` FROM `admin_type` WHERE `admin_type_id` = '$_SESSION[admin_type_id]'";
+$role = mysqli_fetch_assoc(executeQuery($userRole));
 
 if (isset($_POST['submitBtn'])) {
     // Household Info
     $hFname = $_POST['hFname'];
-    $hMname = isset($_POST['hMName']) ?  $_POST['hMname'] : "";
-    $hLname = $_POST['hLname'] . " " . $_POST['hSuffix'];
-    $remarks = isset($_POST['remarks']) ? $_POST['remarks'] : "";
+    $hMname = isset($_POST['hMname']) ?  $_POST['hMname'] : "";
+    $hLname = "";
+    if (isset($_POST['hSuffix'])) {
+        $hLname = $_POST['hLname'] . " " . $_POST['hSuffix'];
+    } else if (!isset($_POST['hSuffix'])) {
+        $hLname = $_POST['hLname'];
+    }
     $membersCount = $_POST['membersCount'];
 
     //Personal Info
     $residentID;
     $fName = $_POST['fName'];
     $mName = isset($_POST['mName']) ?  $_POST['mName'] : "";
+    $lName = "";
     if (isset($_POST['suffix'])) {
         $lName = $_POST['lName'] . " " . $_POST['suffix'];
-    } else {
+    } else if (!isset($_POST['suffix'])){
         $lName = $_POST['lName'];
     }
     $gender = $_POST['gender'];
@@ -31,8 +39,9 @@ if (isset($_POST['submitBtn'])) {
     $address = $_POST['address'];
     $purok = $_POST['purok'];
     $organization = $_POST['organization'];
+    $remarks = isset($_POST['remarks']) ? $_POST['remarks'] : "";
     $householdID; //foreign key
-    $date_added = date("Y-m-d");
+    // $date_added = date("Y-m-d");
     $encryptedName = $fName . " " . $lName;
 
     // Educational Info
@@ -40,6 +49,7 @@ if (isset($_POST['submitBtn'])) {
     $educlevel = isset($_POST['educLevel']) ? ($_POST['educLevel']) : "N/A";
     $schoolType = isset($_POST['schoolType']) ? ($_POST['schoolType']) : "N/A";
     $school = isset($_POST['schoolName']) ? ($_POST['schoolName']) : "N/A";
+    $schoolName = mysqli_real_escape_string($conn, $school);
     $educIndustry =  isset($_POST['educIndustry']) ? ($_POST['educIndustry']) : "64"; //foreign key
     $educSalary = isset($_POST['educSalary']) ? ($_POST['educSalary']) : "1"; // foreign key
 
@@ -52,23 +62,12 @@ if (isset($_POST['submitBtn'])) {
     $employSalary = isset($_POST['employSalary']) ? $_POST['employSalary'] : "1"; //foreign key
 
     //FOR ENCRYPTED IDs
+    $key = 'kkis2023';
     $rEncrypt = $fName . " " . $mName . " " . $lName;
     $hEncrypt = $hFname . " " . $hMname . " " . $hLname;
 
-    $ciphering = "AES-128-CTR"; //cipher method
-
-    $iv_length = openssl_cipher_iv_length($ciphering); //Using OpenSSl Encryption method
-    $options = 0;
-
-    $encryption_iv = '1234567891011121'; // Non-NULL Initialization Vector for encryption   
-    $encryption_key = "KKIS2022-2023"; // Storing the encryption key
-
-    // Using openssl_encrypt() function to encrypt the data
-    $encryptedResident = openssl_encrypt($rEncrypt, $ciphering, $encryption_key, $options, $encryption_iv);
-    $encryptedHousehold = openssl_encrypt($hEncrypt, $ciphering, $encryption_key, $options, $encryption_iv);
-
-    //Query for Households
-    $queryHousehold = "INSERT INTO `households` (`hencrypted_id`, `head_first_name`, `head_middle_name`, `head_last_name`, `head_remarks`, `members_count`) VALUES ('" . $encryptedHousehold . "','" . $hFname . "' , '" . $hMname . "', '" . $hLname . "', '" . $remarks . "', '" . $membersCount . "')";
+    $encryptedResident = Encryption::Encode($rEncrypt, $key);
+    $encryptedHousehold = Encryption::Encode($hEncrypt, $key);
 
     //Query for checking if RESIDENT entry already exists
     $checkResidents = "SELECT * FROM `residents` WHERE `rencrypted_id` = '$encryptedResident'";
@@ -86,15 +85,19 @@ if (isset($_POST['submitBtn'])) {
             }
             
           });
-            </script>";
+        </script>";
     } else {
+        //Query for Households
+        $queryHousehold = "INSERT INTO `households` (`hencrypted_id`, `head_first_name`, `head_middle_name`, `head_last_name`, `members_count`) VALUES ('" . $encryptedHousehold . "','" . $hFname . "' , '" . $hMname . "', '" . $hLname . "', '" . $membersCount . "')";
+
         //Query for checking if HOUSEHOLD entry already exists
         $checkHouseholds = "SELECT * FROM `households` WHERE `hencrypted_id` = '$encryptedHousehold'";
         $existingHousehold = executeQuery($checkHouseholds);
 
+        $updateHousehold = "UPDATE `households` SET `members_count` = '$membersCount' WHERE `hencrypted_id` = '$encryptedHousehold'";
+
         if ($householdCount = mysqli_num_rows($existingHousehold) > 0) {
             //If entry already exists, update the Remarks column and get the updated row ID
-            $updateHousehold = "UPDATE `households` SET `head_remarks` = '$remarks' WHERE `hencrypted_id` = '$encryptedHousehold'";
             executeQuery($updateHousehold);
 
             //Then get the household_id of the updated row and pass the value to $householdID
@@ -110,25 +113,48 @@ if (isset($_POST['submitBtn'])) {
         }
 
         //FOR QR CODE GENERATION
+
         $path = 'assets/img/qrCodes/';
-        $file = $path . uniqid('KKIS-') . ".png";
+        $file = $path . "KKIS-" . $rEncrypt . ".png";
         $ecc = 'Q';
         $pixelSize = 65;
         $frameSize = 2;
         QRcode::png($encryptedResident, $file, $ecc, $pixelSize, $frameSize);
 
+        //ADD LOGO IN QR CODE
+        $logoPath = "assets/img/logos/kkis-logo.png";
+        $QRImg = imagecreatefrompng($file);
+        $logoImg = imagecreatefromstring(file_get_contents($logoPath));
+
+        $QRImgWidth = imagesx($QRImg);
+        $QRImgHeight = imagesy($QRImg);
+
+        $logoWidth = imagesx($logoImg);
+        $logoHeight = imagesy($logoImg);
+
+        //SCALE THE LOGO TO FIT IN THE QR CODE
+        $logoQRWidth = $QRImgWidth / 4.5;
+        $scale = $logoWidth / $logoQRWidth;
+        $logoQRHeight = $logoHeight / $scale;
+
+        imagecopyresampled($QRImg, $logoImg, $QRImgWidth / 2.5, $QRImgHeight / 2.5, 0, 0, $logoQRWidth, $logoQRHeight, $logoWidth, $logoHeight);
+
+        //SAVE QR CODE WITH LOGO ON IT
+        imagepng($QRImg, $file);
+
         //Query for Personal info
-        $queryPersonal = "INSERT INTO `residents`(`rencrypted_id`, `first_name`, `middle_name`, `last_name`, `gender_preference`, `birthday`, `birthplace`, `marital_status`, `religion`, `disability`, `contact_no`, `voter_type`, `house_address`, `purok`, `organization`, `qr_code`, `household_id`, `date_added`) VALUES ('" . $encryptedResident . "','" . $fName . "', '" . $mName . "', '" . $lName . "', '" . $gender . "', '" . $birthday . "', '" . $birthplace . "', '" . $mStatus . "', '" . $religion . "', '" . $disability . "', '" . $contact . "', '" . $voterType . "', '" . $address . "', '" . $purok . "', '" . $organization . "', '" . $file . "', '" . $householdID . "', '" . $date_added . "')";
+        $queryPersonal = "INSERT INTO `residents`(`rencrypted_id`, `first_name`, `middle_name`, `last_name`, `gender_preference`, `birthday`, `birthplace`, `marital_status`, `religion`, `disability`, `contact_no`, `voter_type`, `house_address`, `purok`, `organization`, `remarks`, `qr_code`, `household_id`) VALUES ('" . $encryptedResident . "','" . $fName . "', '" . $mName . "', '" . $lName . "', '" . $gender . "', '" . $birthday . "', '" . $birthplace . "', '" . $mStatus . "', '" . $religion . "', '" . $disability . "', '" . $contact . "', '" . $voterType . "', '" . $address . "', '" . $purok . "', '" . $organization . "', '" . $remarks . "', '" . $file . "', '" . $householdID . "')";
 
         //Execute personal info insertion and get the id of the inserted entry
         executeQuery($queryPersonal);
         $residentID = mysqli_insert_id($conn);
 
         //Query for Educational Info
-        $queryEducation = "INSERT INTO `educational_info`(`student_status`, `student_level`, `school_type`, `school_name`, `industry_id`, `salary_id`, `resident_id`) VALUES ('" . $educStatus . "', '" . $educlevel . "', '" . $schoolType . "', '" . $school . "', '" . $educIndustry . "', '" . $educSalary . "', '" . $residentID . "')";
+        $queryEducation = "INSERT INTO `educational_info`(`student_status`, `student_level`, `school_type`, `school_name`, `industry_id`, `salary_id`, `resident_id`) VALUES ('" . $educStatus . "', '" . $educlevel . "', '" . $schoolType . "', '" . $schoolName . "', '" . $educIndustry . "', '" . $educSalary . "', '" . $residentID . "')";
 
         //Query for Employment Info
         $queryEmployment = "INSERT INTO `employment_info`(`employment_status`, `employee_type`, `employer_type`, `employer_name`, `industry_id`, `salary_id`, `resident_id`) VALUES ('" . $employStatus . "', '" . $employeeType . "', '" . $employerType . "', '" . $employer . "', '" . $employIndustry . "', '" . $employSalary . "', '" . $residentID . "')";
+
 
         //Determine which query to execute based on selected radio button
         if (isset($_POST['educInfo'])) {
@@ -143,24 +169,22 @@ if (isset($_POST['submitBtn'])) {
             echo "<script>
             Swal.fire({
                 icon: 'success',
-                title: 'Entry added successfully, house updated',
+                title: 'Entry added successfully!',
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = './addEntry.php';
                 }
-            
           });
             </script>";
         } else if (($queryPersonal && $queryHousehold) && ($queryEducation || $queryEmployment)) {
             echo "<script>
             Swal.fire({
                 icon: 'success',
-                title: 'Entry added successfully',
+                title: 'Entry added successfully!',
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = './addEntry.php';
                 }
-            
           });
             </script>";
         }
@@ -180,9 +204,7 @@ if (isset($_POST['submitBtn'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
 
     <!-- Custom Stylesheets -->
-    <link rel="stylesheet" href="assets/scss/addUpdate.css">
-    <link rel="stylesheet" href="assets/scss/mediaquery.css">
-    <link rel="stylesheet" href="assets/scss/modal.css">
+    <link rel="stylesheet" href="assets/scss/addEntry.css">
     <link rel="stylesheet" href="assets/scss/sideMenu.css">
 
     <!-- Favicon -->
@@ -194,7 +216,15 @@ if (isset($_POST['submitBtn'])) {
 <body>
 
     <div class="expanded d-none d-lg-flex" id="leftPanel">
-        <?php require('sideMenu.php'); ?>
+        <?php
+        if ($adminTypeID == 1) {
+            include 'sideMenu.php';
+        } else if ($adminTypeID == 2) {
+            include 'sideMenu-admin.php';
+        } else {
+            include "sideMenu-staff.php";
+        }
+        ?>
     </div>
 
     <div class="mainContainer" id="mainPanel">
@@ -210,7 +240,7 @@ if (isset($_POST['submitBtn'])) {
                 </div>
 
                 <div class="col-md-4 d-none d-md-flex justify-content-end align-items-center">
-                    <span class="accountType">Super Admin Account</span>
+                    <span class="accountType"><?php echo $role["description"] ?></span>
                 </div>
             </div>
             <hr id="headerHR">
@@ -221,28 +251,28 @@ if (isset($_POST['submitBtn'])) {
             <div class="sectionDiv">
                 <form method="POST" id="addForm" class="mb-5">
                     <!-- Personal Info -->
-                    <div class="card my-4">
+                    <div class="card my-4 darkBG">
                         <div class="row m-0">
                             <div class="col col-12 p-0">
                                 <div class="d-flex d-xxl-flex align-items-center align-items-xxl-center markerDiv rounded-2" id="markerPersonal">Personal Information</div>
                             </div>
                         </div>
                         <div class="row m-0 my-3 gy-3 gx-3">
-                            <div class="col col-lg-3 col-md-3 col-sm-12 col-12">
+                            <div class="col-md-3 col-sm-12 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" id="fNameLbl" for="firstName">First Name</label>
                                 <input class="form-control userInput text-uppercase w-100" name="fName" id="firstName" type="text" required>
                             </div>
-                            <div class="col col-lg-3 col-md-3 col-sm-12 col-12">
+                            <div class="col-md-3 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" id="mNameLbl" for="middleName">Middle Name</label>
                                 <input class="form-control userInput text-uppercase w-100" name="mName" id="middleName" type="text">
                             </div>
-                            <div class="col col-lg-3 col-md-3 col-sm-8 col-12">
+                            <div class="col-md-3 col-sm-8 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" id="lNameLbl" for="lastName">Last Name</label>
                                 <input class="form-control userInput text-uppercase w-100" name="lName" id="lastName" type="text" required>
                             </div>
                             <div class="col col-lg-1 col-md-3 col-sm-4 col-12">
                                 <label class="col-form-label required fieldLabel w-100 p-1" for="suf" id="suffixLbl">Suffix</label>
-                                <input class="form-control userInput text-uppercase w-100" name="suffix" type="text" id="suf">
+                                <input class="form-control userInput text-uppercase w-100" val="" name="suffix" type="text" id="suf">
                             </div>
                             <div class="col col-lg-2 col-md-2 col-sm-6 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="genderPreference">Gender Preference</label>
@@ -258,13 +288,13 @@ if (isset($_POST['submitBtn'])) {
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="bday">Birthday</label>
                                 <input class="form-control text-uppercase w-100 personalSelectBox" name="birthday" id="bday" type="date" required>
                             </div>
-                            <div class="col col-lg-3 col-md-4 col-sm-6 col-12">
+                            <div class="col col-lg-2 col-md-4 col-sm-6 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="bplace">Birthplace</label>
                                 <input class="form-control userInput text-uppercase w-100" name="birthplace" id="bplace" type="text" required>
                             </div>
                             <div class="col col-lg-2 col-md-3 col-sm-6 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="maritalStatus">Marital Status</label>
-                                <select class="form-select text-uppercase w-100 personalSelectBox" name="mStatus" id="maritalStatus" placeholder="Select Religion" required>
+                                <select class="form-select text-uppercase w-100 personalSelectBox" name="mStatus" id="maritalStatus" required>
                                     <option value="SINGLE">Single</option>
                                     <option value="MARRIED">Married</option>
                                     <option value="LIVE IN">Live-in</option>
@@ -283,7 +313,7 @@ if (isset($_POST['submitBtn'])) {
                                     <option value="OTHERS">Others</option>
                                 </select>
                             </div>
-                            <div class="col col-lg-3 col-md-3 col-sm-6 col-12">
+                            <div class="col col-lg-2 col-md-3 col-sm-6 col-12">
                                 <div class="disabilityDiv">
                                     <label class="col-form-label fieldLabel required w-100 p-1" for="disabilitySelect">Disability</label>
                                     <!-- Class form-select  removed from select element in Disability -->
@@ -298,24 +328,27 @@ if (isset($_POST['submitBtn'])) {
                                     </select>
                                 </div>
                             </div>
+
                             <div class="col col-lg-2 col-md-3 col-sm-6 col-12">
-                                <label class="col-form-label fieldLabel required w-100 p-1" for="contactNo">Contact No.</label>
-                                <input class="form-control text-uppercase w-100" type="text" name="contact" id="contactNo" placeholder="09XXXXXXXXX" inputmode="numeric" required>
-                            </div>
-                            <div class="col col-lg-2 col-md-3 col-sm-6 col-12" for="residentVote">
-                                <label class="col-form-label fieldLabel required w-100 p-1">Voter Type</label>
+                                <label class="col-form-label fieldLabel required w-100 p-1" for="residentVote">Voter Type</label>
                                 <select class="form-select text-uppercase w-100 personalSelectBox" name="voterType" id="residentVote" required>
                                     <option value="REGISTERED">Registered</option>
                                     <option value="UNREGISTERED">Unregistered</option>
                                 </select>
                             </div>
-                            <div class="col col-lg-3 col-md-6 col-sm-8 col-12">
+
+                            <div class="col col-lg-2 col-md-3 col-sm-6 col-12">
+                                <label class="col-form-label fieldLabel required w-100 p-1" for="contactNo">Contact No.</label>
+                                <input class="form-control userInput text-uppercase w-100 phoneNumber" type="text" name="contact" id="contactNo" pattern="[0-9]{11}" title="Contact number should only contain 11 characters from 0-9" placeholder="09XXXXXXXXX" inputmode="numeric" required>
+                            </div>
+
+                            <div class="col col-lg-3 col-md-3 col-sm-8 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="residentAddress">House No./Street/Subdivision</label>
                                 <input class="form-control userInput text-uppercase w-100" type="text" name="address" id="residentAddress" required>
                             </div>
-                            <div class="col col-lg-2 col-md-2 col-sm-4 col-12">
+                            <div class="col col-lg-2 col-md-3 col-sm-4 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="residentPurok">Purok</label>
-                                <select class="form-select text-uppercase w-100 personalSelectBox" name="purok" id="residentPurok" required>
+                                <select class="form-select text-uppercase w-100 personalSelectBox" placeholder="Purok" name="purok" id="residentPurok" required>
                                     <option value="CARDINAL">Cardinal</option>
                                     <option value="CORDILLERA">Cordillera</option>
                                     <option value="DOÑA PETRA">Doña Petra</option>
@@ -335,17 +368,27 @@ if (isset($_POST['submitBtn'])) {
                                     <option value="SMOKEY MOUNTAIN">Smokey Mountain </option>
                                 </select>
                             </div>
-                            <div class="col col-lg-3 col-md-4 col-sm-12 col-12">
+                            <div class="col col-lg-3 col-md-3 col-sm-8 col-12">
                                 <label class="col-form-label fieldLabel w-100 p-1" for="org" id="organizationLbl">Organization (if any)</label>
                                 <input class="form-control userInput text-uppercase w-100" type="text" name="organization" id="org">
                             </div>
+                            <div class="col col-lg-2 col-md-3 col-sm-4 col-12">
+                                <label class="col-form-label fieldLabel w-100 p-1" for="remarks" id="remarksLbl">Remarks (if any)</label>
+                                <select class="selectpicker form-control text-uppercase personalSelectBox" multiple name="remarks" placeholder="Select Remarks" data-selected-text-format="count > 3" id="remarkDrop">
+                                    <option value="PUROK LEADER">PUROK LEADER</option>
+                                    <option value="SK SCHOLAR">SK SCHOLAR</option>
+                                    <option value="SOLO PARENT">SOLO PARENT</option>
+                                    <option value="TEENAGE PREGNANCY">TEENAGE PREGNANCY</option>
+                                </select>
+                            </div>
                         </div>
+                        <!-- Personal Info card end -->
                     </div>
 
                     <div class="row gy-2 my-2 mx-0">
                         <!-- Educational Info -->
                         <div class="col eStatus col-lg-6 col-md-12 col-sm-12 col-12 p-0">
-                            <div class="card p-3" id="educCard">
+                            <div class="card p-3 darkBG" id="educCard">
                                 <div class="d-flex align-items-center markerDiv rounded-2 m-0 w-100" id="markerEduc">
                                     <label class="d-flex align-items-center justify-content-start">
                                         <input type="radio" id="educCheck" class="statusCheck" name="educInfo" checked>
@@ -470,7 +513,7 @@ if (isset($_POST['submitBtn'])) {
                         </div>
                         <!-- Employment Info -->
                         <div class="col eStatus col-lg-6 col-md-12 col-sm-12 col-12 p-0">
-                            <div class="card p-3" id="employCard">
+                            <div class="card p-3 darkBG" id="employCard">
                                 <div class="d-flex align-items-center markerDiv rounded-2 m-0 w-100" id="markerEmploy">
                                     <label class="d-flex align-items-center">
                                         <input type="radio" id="employCheck" class="statusCheck" name="employInfo">
@@ -589,7 +632,7 @@ if (isset($_POST['submitBtn'])) {
                         </div>
                     </div>
                     <!-- House Declaration -->
-                    <div class="card p-3 my-4">
+                    <div class="card p-3 my-4 darkBG">
                         <div class="row m-0">
                             <div class="col col-12 p-0">
                                 <div class="d-flex align-items-center markerDiv rounded-2">
@@ -598,37 +641,24 @@ if (isset($_POST['submitBtn'])) {
                             </div>
                         </div>
                         <div class="row m-0 my-3 gy-3 gx-3" id="householdRow">
-                            <div class="col col-lg-2 col-md-3 col-sm-12 col-12">
+                            <div class="col col-lg-3 col-md-4 col-sm-12 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="headFname">First Name</label>
                                 <input class="form-control userInput text-uppercase w-100" type="text" name="hFname" id="headFname" required>
                             </div>
-                            <div class="col col-lg-2 col-md-3 col-sm-12 col-12">
+                            <div class="col col-lg-3 col-md-4 col-sm-12 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" id="hMNameLbl" for="headMname">Middle Name</label>
                                 <input class="form-control userInput text-uppercase w-100" type="text" name="hMname" id="headMname">
                             </div>
-                            <div class="col col-lg-2 col-md-3 col-sm-12 col-12">
+                            <div class="col col-lg-3 col-md-4 col-sm-12 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="headLname">Last Name</label>
                                 <input class="form-control userInput text-uppercase w-100" type="text" name="hLname" id="headLname">
                             </div>
-                            <div class="col col-lg-1 col-md-3 col-sm-12 col-12">
+                            <div class="col col-lg-1 col-sm-6 col-12">
                                 <label class="col-form-label fieldLabel required w-100 p-1" for="headSuffix" id="headSuffixLbl">Suffix</label>
                                 <input class="form-control userInput text-uppercase w-100" type="text" name="hSuffix" id="headSuffix">
                             </div>
-                            <div class="col col-lg-3 col-md-6 col-sm-6 col-12" id="colRemarks">
-                                <div class="remarkDiv">
-                                    <label class="col-form-label fieldLabel required w-100 p-1" for="remarkDrop" id="remarksLbl">Remarks</label>
-                                    <!-- Class form-select  removed from select element in Remarks -->
-                                    <select class="selectpicker form-control text-uppercase houseSelectBox" multiple name="remarks" placeholder="Select Remarks" data-selected-text-format="count > 3" id="remarkDrop">
-                                        <option value="PUROK LEADER ">Purok Leader</option>
-                                        <option value="SK SCHOLAR ">SK Scholar</option>
-                                        <option value="SOLO LIVING ">Solo Living</option>
-                                        <option value="SOLO PARENT ">Solo Parent</option>
-                                        <option value="TEENAGE PREGNANCY ">Teenage Pregnancy</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col col-lg-2 col-md-6 col-sm-6 col-12">
-                                <label class="col-form-label fieldLabel required w-100 p-1" for="famCount">No.&nbsp; of Family Members</label>
+                            <div class="col-lg-2 col-sm-6 col-12">
+                                <label class="col-form-label fieldLabel required w-100 p-1" for="famCount">No. of Family Members</label>
                                 <select class="form-select text-uppercase w-100 houseSelectBox" name="membersCount" id="famCount" required>
                                     <option value="LESS THAN 5">Less than 5</option>
                                     <option value="5 to 10">5 to 10</option>
@@ -647,54 +677,6 @@ if (isset($_POST['submitBtn'])) {
                         </div>
                     </div>
                 </form>
-
-                <!-- Added Modal -->
-                <div class="modal fade center" role="dialog" tabindex="-1" id="modalAdded">
-                    <div class="modal-dialog h-100 m-auto d-flex align-items-center" role="document">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <div class="m-0 d-flex justify-content-end align-items-center">
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="row m-0">
-                                    <div class="col col-12 p-0">
-                                        <svg class="checkmark my-4" xmlns="https://www.svgrepo.com/show/137031/check.svg" viewBox="0 0 50 50">
-                                            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-                                            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                        </svg>
-                                    </div>
-                                    <div class="col col-12">
-                                        <h3 class="modalAlert text-center">Added New Entry!</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Record Exist Modal -->
-                <div class="modal fade center" role="dialog" tabindex="-1" id="recordExist">
-                    <div class="modal-dialog h-100 m-auto d-flex align-items-center" role="document">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <div class="m-0 d-flex justify-content-end align-items-center">
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="row m-0">
-                                    <div class="col col-12 p-0">
-                                        <svg class="checkmark my-4" xmlns="https://www.svgrepo.com/show/137031/check.svg" viewBox="0 0 50 50">
-                                            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-                                            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                                        </svg>
-                                    </div>
-                                    <div class="col col-12">
-                                        <h3 class="modalAlert text-center">Record Already Exists</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -705,6 +687,8 @@ if (isset($_POST['submitBtn'])) {
     <!-- Custom Script -->
     <script type="text/javascript" src="assets/js/addEntry.js"></script>
     <script type="text/javascript" src="assets/js/sideMenu.js"></script>
+    <script type="text/javascript" src="assets/js/settings.js"></script>
+    <script type="text/javascript" src="assets/js/phoneNum.js"></script>
 
     <!-- Active Link -->
     <script type="text/javascript">

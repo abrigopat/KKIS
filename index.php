@@ -1,12 +1,5 @@
 <?php
-// XAMPP
-
-include 'connection.php';
-
-
-include 'controller.php';
-
-
+require "controller.php";
 ?>
 
 <!DOCTYPE html>
@@ -26,7 +19,6 @@ include 'controller.php';
     <!-- Custom Stylesheets -->
     <link rel="stylesheet" href="assets/css/animatedBG.css">
     <link rel="stylesheet" href="assets/scss/index.css">
-    <link rel="stylesheet" href="assets/scss/mediaquery.css">
     <link rel="stylesheet" href="assets/scss/sideMenu.css">
 
     <!-- Favicon -->
@@ -36,7 +28,6 @@ include 'controller.php';
 <body>
 
     <div class="header">
-
         <!--Content before waves-->
         <div class="inner-header flex">
 
@@ -114,7 +105,7 @@ include 'controller.php';
                                 <div class="col-12 text-center p-0"><img class="img-fluid hrSvg" src="assets/img/misc/hr.svg"></div>
                             </div>
                             <!-- Form -->
-                            <form id="signupForm" action="" onSubmit="return validate();" method="post">
+                            <form id="signupForm" action="" onSubmit="return validate();" method="POST">
                                 <!-- Fields -->
                                 <div class="row gx-3 gy-3 fieldRow">
                                     <div class="col-lg-6 col-md-6 col-sm-12 col-12">
@@ -127,7 +118,8 @@ include 'controller.php';
                                         <input class="form-control" type="date" name="birthday" placeholder="Birthday" required>
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-12 col-12">
-                                        <input class="form-control" type="text" name="contactNumber" inputmode="numeric" placeholder="Contact No." maxlength="11" required>
+                                        <input class="form-control" type="text" name="contactNumber" pattern="[0-9]{11}" title="Contact number should only contain 11 characters from 0-9" inputmode="numeric" placeholder="Contact No." required>
+                                    
                                     </div>
                                     <div class="col-12">
                                         <input class="form-control" type="email" name="email" placeholder="Email" maxlength="30" required>
@@ -143,9 +135,18 @@ include 'controller.php';
                                         <i class="toggle-password far fa-eye-slash" id="toggleSignupconPassword" toggle="#password-field"></i>
                                         </span>
                                     </div>
+                                    <!-- Password mismatch -->
+                                    <div id="messageDiv" class="d-none d-flex justify-content-start align-items-center my-0 py-1">
+                                        <i class="fa-solid fa-circle-exclamation" style="color: red; margin-right: 5px"></i>
+                                        <span id="message" class=" text-start py-1 my-0"></span>
+                                    </div>
                                 </div>
                                 <!-- Sign up btn -->
-                                <div class="row m-0 mt-3" id="rowBtn">
+                                <div class="row m-0" id="rowBtn">
+                                    <div class="d-flex justify-content-center align-items-center px-0 py-3">
+                                        <input type="checkbox" name="agreeCheck" id="agreeCheck" class="me-2" required>
+                                        <label id="agree-phrase" for="agreeCheck">I have read and agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsConditions">Terms and Conditions</a></label>
+                                    </div>
                                     <div class="col-12 d-flex justify-content-center align-items-center">
                                         <button class="btn controlBtn rounded-pill mt-3" name="signupBtn" type="submit" form="signupForm" id="signupBtn">Sign up</button>
                                     </div>
@@ -157,6 +158,98 @@ include 'controller.php';
                         </div>
                     </div>
 
+                    <!-- Terms and Conditions -->
+                    <div class="modal fade" tabindex="-1" id="termsConditions">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div class="d-flex justify-content-start align-items-start">
+                                        <img src="assets/img/logos/kkis-brand.svg" alt="" width="50px" height="auto">
+                                        <span class="ms-1 modal-title" id="modalTitle">KKIS</span>
+                                    </div>
+                                </div>
+                                <div class="modal-body">
+                                    <h5 class="text-start">Terms and Conditions</h5>
+                                    <p class="text-start">
+                                        These Website Standard Terms and Conditions written on this webpage shall manage your use of our website, Katipunan ng Kabataan Information System accessible at url.
+                                    </p>
+
+                                    <p class="text-start">
+                                        These Terms will be applied fully and affect your use of this Website. By using this Website, you agreed to accept all terms and conditions written here. You must not use this Website if you disagree with any of these Website\'s Standard Terms and Conditions.
+                                    </p>
+
+                                    <p class="text-start">Only authorized personnel are allowed to use this Website.</p>
+
+                                    <br>
+                                    <h5 class="text-start">Interpretation and Definitions</h5>
+
+                                    <h6 class="text-start">Interpretation</h6>
+                                    <p class="text-start">
+                                        The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or plural.
+                                    </p>
+
+                                    <h6 class="text-start">Definitions</h6>
+                                    <p class="text-start">For the purposes of these Terms and Conditions:</p>
+                                    <p class="text-start"><i>Authorized</i> means having official permission or approval.</p>
+
+                                    <p class="text-start"><i>Company</i> (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to Katipunan ng Kabataan Information System website.</p>
+
+                                    <p class="text-start"><i>Content</i> refers to such as text, images, or other information that can be posted, uploaded, linked to, or otherwise made available by You, regardless of the form of that content.</p>
+
+                                    <p class="text-start"><i>Device</i> means any device that can access the Service such as a computer, a cellphone, or a digital tablet.</p>
+
+                                    <p><i>Terms and Conditions</i> (also referred to as "Terms") mean these Terms and Conditions that form the entire agreement between You and the Company regarding the use of the Service.</p>
+
+                                    <p class="text-start"><i>Website</i> refers to Katipunan ng Kabataan Information System.</p>
+
+                                    <p class="text-start"><i>You</i> mean the individual accessing or using the Service, or the company, or otherlegal entity on behalf of which such individual is accessing or using the Service, as applicable.</p>
+
+                                    <h6 class="text-start">Acknowledgment</h6>
+                                    <p class="text-start">These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Website. These Terms and Conditions set out the rights and obligations of all users regarding the use of the Service.</p>
+
+                                    <p class="text-start">Your access to and use of the Service is conditioned on Your acceptance of and compliance with these Terms and Conditions. These Terms and Conditions apply to all visitors, users, and others who access or use the Service.</p>
+
+                                    <p class="text-start">By accessing or using the Service You agree to be bound by these Terms and Conditions. If You disagree with any part of these Terms and Conditions then You may not access the Service.</p>
+
+                                    <p class="text-start">Your access to and use of the Service is also conditioned on Your acceptance of and compliance with the Privacy Policy of the Company.</p>
+
+                                    <p class="text-start">Our Privacy Policy describes Our policies and procedures on the collection, use, and disclosure of Your personal information when You use the Application or the Website and tells You about Your privacy rights and how the law protects You.</p>
+
+                                    <p class="text-start">Please read Our Privacy Policy carefully before using Our Service.</p>
+
+                                    <ol>
+                                        <li>
+                                            <b class="text-start">Intellectual Property Rights</b>
+                                            <p class="text-start">Other than the content you own, under these Terms, KKIS and/or its licensors own all the intellectual property rights and materials contained in this Website.</p>
+                                            <p class="text-start">You are granted a limited license only for the purposes of viewing the material contained on this Website.</p>
+                                        </li>
+
+                                        <li>
+                                            <b class="text-start">Limitation of Liability</b>
+                                            <p class="text-start">In no event shall KKIS and any of its developers be held liable for anything arising out of or in any way connected with your use of this Website whether such liability is under contract. KKIS, including its developers, shall not be held liable for any indirect, consequential, or special liability arising out of or in any way related to your use of this Website.</p>
+                                        </li>
+
+                                        <li>
+                                            <b class="text-start">Suspension and Termination of Services</b>
+                                            <p class="text-start">We may terminate or suspend Your access immediately, without prior notice or liability, for any reason whatsoever, including without limitation if You breach these Terms and Conditions.</p>
+                                            <p>Upon termination, Your right to use the Service will cease immediately.</p>
+                                        </li>
+
+                                        <li>
+                                            <b class="text-start">Changes to These Terms and Conditions</b>
+                                            <p class="text-start">At Our sole discretion, we reserve the right to modify or replace these Terms at any time. If a revision is material We will make reasonable efforts to provide at least 30 days notice prior to any new terms taking effect. What constitutes a material change will be determined at Our sole discretion.</p>
+                                            <p class="text-start">By continuing to access or use Our Service after those revisions become effective, You agree to be bound by the revised terms. If You do not agree to the new terms, in whole or in part, please stop using the website and the Service.</p>
+                                        </li>
+
+                                        <li>
+                                            <b class="text-start">Governing Law</b>
+                                            <p class="text-start">The laws of the Country, excluding its conflicts of law rules, shall govern these Terms and Your use of the Service. Your application use may also be subject to other local, state, national, or international laws.</p>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Forgot Password -->
                     <div class="card d-flex justify-content-center d-none" id="forgotPassCard">
@@ -181,7 +274,7 @@ include 'controller.php';
                                         <i class="toggle-password far fa-eye-slash" id="toggle_new_forgot_pass" toggle="#password-field"></i>
                                     </div>
                                     <div class="col-12">
-                                    
+
                                         <input class="form-control" type="password" name="confirmPassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number, one uppercase and lowercase letter, and should be at least 8 or more 
                                         characters" placeholder="Confirm New Password" id="confirm_forgot_pass" required>
                                         <i class="toggle-password far fa-eye-slash" id="toggle_confirm_forgot_pass" toggle="#password-field"></i>
@@ -221,13 +314,14 @@ include 'controller.php';
     </div>
 
     <!-- Fundamental Links -->
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
     <!-- Custom Script -->
     <script type="text/javascript" src="assets/js/index.js"></script>
     <script type="text/javascript" src="assets/js/formValidation.js"></script>
     <script type="text/javascript" src="assets/js/showPass.js"></script>
-    
+
 </body>
+
 </html>
