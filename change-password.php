@@ -1,3 +1,9 @@
+<?php
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,21 +58,21 @@
                                     <div class="mt-3 row">
                                         <label for="firstName" class="col-xl-3 col-lg-12 col-form-label">First Name</label>
                                         <div class="col-xl-8 col-lg-12">
-                                            <input type="text" class="form-control" id="firstName">
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-3 row">
-                                        <label for="middleName" class="col-xl-3 col-lg-12 col-form-label">Middle Name</label>
-                                        <div class="col-xl-8 col-lg-12">
-                                            <input type="text" class="form-control" id="middleName">
+                                            <input type="text" class="form-control" name="firstName" id="firstName">
                                         </div>
                                     </div>
 
                                     <div class="mt-3 row">
                                         <label for="lastName" class="col-xl-3 col-lg-12 col-form-label">Last Name</label>
                                         <div class="col-xl-8 col-lg-12">
-                                            <input type="text" class="form-control" id="lastName">
+                                            <input type="text" class="form-control" name="lastName" id="lastName">
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3 row">
+                                        <label for="middleName" class="col-xl-3 col-lg-12 col-form-label">Birthday</label>
+                                        <div class="col-xl-8 col-lg-12">
+                                            <input class="form-control" type="date" name="birthday" required>
                                         </div>
                                     </div>
                                 </div>
@@ -74,16 +80,16 @@
                                 <!-- Right Column col-xxl-6 col-xl-6 -->
                                 <div class="col-sm-6">
                                     <div class="mt-3 row">
-                                        <label for="email" class="col-xl-3 col-lg-12 col-form-label">Email</label>
+                                        <label for="newEmail" class="col-xl-3 col-lg-12 col-form-label">New Email</label>
                                         <div class="col-xl-9 col-lg-12">
-                                            <input type="email" class="form-control" id="email">
+                                            <input type="email" class="form-control" name="newEmail">
                                         </div>
                                     </div>
 
                                     <div class="mt-3 row">
-                                        <label for="email" class="col-xl-3 col-lg-12col-form-label">Contact Number</label>
+                                        <label for="email" class="col-xl-3 col-lg-12 col-form-label">Contact Number</label>
                                         <div class="col-xl-9 col-lg-12">
-                                            <input type="numerals" class="form-control" id="contactNo">
+                                            <input type="numerals" class="form-control" name="contactNo" id="contactNo">
                                         </div>
                                     </div>
                                 </div>
@@ -104,7 +110,7 @@
 
                 <!-- START OF CHANGE PASSWORD -->
                 <div class="changePassPanel mt-4">
-                    <h4 class="mb-4">Change Password</h4>
+                    <h4 class="mb-4">Update Password</h4>
 
                     <div class="gradient">
                     </div>
