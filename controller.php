@@ -129,12 +129,14 @@ if (isset($_POST["updatePassBtn"])) {
 
                         if (strlen($password_raw) < 8 || !$number || !$uppercase || !$lowercase || !$specialChars) {
                             echo '<script>alert("Password not strong! Use a combination of uppercase, lowercase, numbers and special characters.")</script>';
-                        } else {
+                        } else if (strlen($password_raw) > 8) {
                             $hash = password_hash($password_raw, PASSWORD_DEFAULT);
 
                             $updatequery = "UPDATE `admins` SET `password`='" . $hash . "' WHERE `email` ='" . $_SESSION['email'] . "'";
                             executeQuery($updatequery);
                             header("Location: index.php");
+                        } else {
+                            echo '<script>alert("may mali")</script>';
                         }
                     } else {
                         echo '<script>alert("Invalid confirm password!")</script>';
@@ -198,10 +200,10 @@ if (isset($_POST["editProfileBtn"])){
 
     $firstName = $_POST['firstName'];
     $lastName = $_POST['lastName'];
-    //$birthday = $_POST['birthday'];
     $email = $_POST['newEmail'];
     $contactNo= $_POST['contactNo'];
 
+    
     $bdayquery = "SELECT * FROM `admins` WHERE `birthday` = '" . $_POST['birthday'] . "'";
 
     $bdayresult = executeQuery($bdayquery);
@@ -220,4 +222,3 @@ if (isset($_POST["editProfileBtn"])){
     }
 
 }
-

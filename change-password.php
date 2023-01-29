@@ -1,9 +1,3 @@
-<?php
-
-
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -55,24 +49,35 @@
                             <div class="row">
                                 <!-- Left Column -->
                                 <div class="col">
+                                    <?php
+                                    $admins_query = "SELECT * FROM `admins`";
+                                    $admins_query_run = executeQuery($admins_query);
+
+                                    $firstName = $_POST['firstName'];
+                                    $lastName = $_POST['lastName'];
+                                    $email = $_POST['newEmail'];
+                                    $contactNo = $_POST['contactNo'];
+                                    
+                                    ?>
+
                                     <div class="mt-3 row">
                                         <label for="firstName" class="col-xl-3 col-lg-12 col-form-label">First Name</label>
                                         <div class="col-xl-8 col-lg-12">
-                                            <input type="text" class="form-control" name="firstName" id="firstName">
+                                            <input type="text" class="form-control" name="firstName" id="firstName" value="<?php echo $firstName ?>">
                                         </div>
                                     </div>
 
                                     <div class="mt-3 row">
                                         <label for="lastName" class="col-xl-3 col-lg-12 col-form-label">Last Name</label>
                                         <div class="col-xl-8 col-lg-12">
-                                            <input type="text" class="form-control" name="lastName" id="lastName">
+                                            <input type="text" class="form-control" name="lastName" id="lastName" value="<?php echo $lastName ?>">
                                         </div>
                                     </div>
 
                                     <div class="mt-3 row">
                                         <label for="middleName" class="col-xl-3 col-lg-12 col-form-label">Birthday</label>
                                         <div class="col-xl-8 col-lg-12">
-                                            <input class="form-control" type="date" name="birthday" required>
+                                            <input class="form-control" type="date" name="birthday" value="<?php echo $birthday ?>" required>
                                         </div>
                                     </div>
                                 </div>
@@ -82,14 +87,14 @@
                                     <div class="mt-3 row">
                                         <label for="newEmail" class="col-xl-3 col-lg-12 col-form-label">New Email</label>
                                         <div class="col-xl-9 col-lg-12">
-                                            <input type="email" class="form-control" name="newEmail">
+                                            <input type="email" class="form-control" name="newEmail" value="<?php echo $email ?>">
                                         </div>
                                     </div>
 
                                     <div class="mt-3 row">
                                         <label for="email" class="col-xl-3 col-lg-12 col-form-label">Contact Number</label>
                                         <div class="col-xl-9 col-lg-12">
-                                            <input type="numerals" class="form-control" name="contactNo" id="contactNo">
+                                            <input type="numerals" class="form-control" name="contactNo" id="contactNo" value="<?php echo $contactNo ?>">
                                         </div>
                                     </div>
                                 </div>
